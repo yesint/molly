@@ -188,16 +188,6 @@ the top of each frame is selected, the advantage is considerable.
 [xdrf]: https://gitlab.com/gromacs/gromacs/-/blob/d8d6543db04563cb15f71c90ffb5ed2fda092bce/src/gromacs/fileio/xdrf.h
 [chemfiles]: https://chemfiles.org/
 
-## XTC Writer Features
-
-| Feature | Status | Location |
-|---------|--------|----------|
-| Full coordinate encoding | ✓ | `encode_full_coord` |
-| Run-length encoding | ✓ | `encode_coordinates` |
-| Water swap | ✓ | `coords.swap(idx, idx + 1)` |
-| Adaptive precision | ✓ | `smallidx` adjustment |
-| Large coordinate handling | ✓ | `encodeints` byte-array path |
-
 ---
 
 Marieke Westendorp, 2024
