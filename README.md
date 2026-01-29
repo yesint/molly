@@ -180,6 +180,12 @@ disk I/O is factored out, buffered reading is around 20% slower than unbuffered
 reading. But over very large trajectories where only a subset of positions from
 the top of each frame is selected, the advantage is considerable.
 
+## Thanks
+
+- I want to thank [Ladislav Bartos](https://github.com/Ladme) for his
+  contributions and feedback, including his fix of the large frame number–bug.
+- Thanks to [Mikael Lund](https://github.com/mlund) for adding writing support.
+
 [sourcehut]: https://git.sr.ht/~ma3ke/molly
 [github]: https://github.com/ma3ke/molly
 [contact]: https://dwangschematiek.nl/where
