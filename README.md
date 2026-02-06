@@ -86,11 +86,11 @@ Find [_molly_ on crates.io][crates].
 ```rust
 use molly::{XTCReader, XTCWriter, Frame};
 
-// Read frames from a trajectory
+// Read frames from a trajectory.
 let mut reader = XTCReader::open("input.xtc")?;
 let frames = reader.read_all_frames()?;
 
-// Write frames to a new file
+// Write frames to a new file.
 let mut writer = XTCWriter::create("output.xtc")?;
 for frame in frames.iter() {
     writer.write_frame(frame)?;
