@@ -46,10 +46,7 @@ fn compare(path: impl AsRef<std::path::Path>) -> std::io::Result<()> {
             .read(&mut xdr_frame)
             .expect("couldn't read xdrfile frame");
 
-        let molly_positions = molly_frame
-            .coords()
-            .map(|c| c.to_array())
-            .collect::<Vec<_>>();
+        let molly_positions = molly_frame.coords().collect::<Vec<_>>();
         let cf_positions = cf_frame.positions();
         let xdr_positions = xdr_frame.coords.as_slice();
 

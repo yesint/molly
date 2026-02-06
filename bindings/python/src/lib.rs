@@ -313,12 +313,15 @@ impl XTCReader {
                 .zip(frame.coords())
                 .for_each(|(mut array_coord, frame_coord)| {
                     // Unwrap should be fine here, since we checked the sizes before.
-                    frame_coord.write_to_slice(array_coord.as_slice_mut().unwrap())
+                    array_coord
+                        .as_slice_mut()
+                        .unwrap()
+                        .copy_from_slice(&frame_coord);
                 });
             array_boxvecs
                 .columns_mut()
                 .into_iter()
-                .zip(frame.boxvec.to_cols_array_2d())
+                .zip(frame.boxvec_cols_2d())
                 .for_each(|(array_boxvec, frame_boxvec)| {
                     for (&frame_value, array_value) in frame_boxvec.iter().zip(array_boxvec) {
                         *array_value = frame_value
@@ -414,12 +417,18 @@ impl Frame {
     /// The box vectors of this frame as an array of columns of a 3×3 matrix.
     #[getter]
     fn get_box(&self) -> BoxVec {
-        self.inner.boxvec.to_cols_array_2d()
+        self.inner.boxvec_cols_2d()
     }
 
     #[setter]
     fn set_box(&mut self, boxvec: BoxVec) {
-        self.inner.boxvec = molly::BoxVec::from_cols_array_2d(&boxvec);
+        // Convert the 2D column-major type to the flattened representation used internally.
+        for (src, dst) in boxvec
+            .into_iter()
+            .zip(self.inner.boxvec.chunks_exact_mut(3))
+        {
+            dst.copy_from_slice(&src);
+        }
     }
 
     #[getter]

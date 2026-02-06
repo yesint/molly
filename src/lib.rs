@@ -2,7 +2,6 @@ use std::fs::File;
 use std::io::{self, Read, Seek, SeekFrom, Write};
 use std::{cell::Cell, path::Path};
 
-use glam::{Mat3, Vec3};
 use reader::read_nbytes;
 
 use crate::buffer::{Buffer, UnBuffered};
@@ -25,7 +24,13 @@ thread_local! {
     static SCRATCH: Cell<Vec<u8>> = const { Cell::new(Vec::new()) };
 }
 
-pub type BoxVec = Mat3;
+/// Box vectors.
+///
+/// Stored as a column-major matrix of Gromacs box vectors.
+pub type BoxVec = [f32; 9];
+
+/// Three-dimensional position in nanometers.
+pub type Position = [f32; 3];
 
 #[repr(i32)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -71,7 +76,7 @@ pub struct Header {
     pub natoms: usize,
     pub step: u32,
     pub time: f32,
-    pub boxvec: Mat3,
+    pub boxvec: BoxVec,
     pub natoms_repeated: usize,
 }
 
@@ -112,13 +117,7 @@ impl Header {
         bytes.extend(natoms); // u32
         bytes.extend(self.step.to_be_bytes()); // u32
         bytes.extend(self.time.to_be_bytes()); // f32
-        bytes.extend(
-            self.boxvec
-                .to_cols_array()
-                .map(f32::to_be_bytes)
-                .iter()
-                .flatten(),
-        ); // 9 × f32
+        bytes.extend(self.boxvec.map(f32::to_be_bytes).iter().flatten()); // 9 × f32
         assert_eq!(self.natoms, self.natoms_repeated);
         bytes.extend(natoms); // u32
 
@@ -131,15 +130,32 @@ pub struct Frame {
     pub step: u32,
     /// Time in picoseconds.
     pub time: f32,
+    /// Box vectors.
+    ///
+    /// Stored as a column-major matrix of Gromacs box vectors.
     pub boxvec: BoxVec,
     pub precision: f32,
     pub positions: Vec<f32>,
 }
 
 impl Frame {
+    /// Returns a 2D column-major representation of the `boxvec` of this [`Frame`].
+    pub fn boxvec_cols_2d(&self) -> [[f32; 3]; 3] {
+        // Though a solution based on, say, .as_chunks() would be much nicer, it is not available
+        // in the minimum supported rust version.
+        let mut res = [[0.0; 3]; 3];
+        for (src, dst) in self.boxvec.chunks_exact(3).zip(&mut res) {
+            dst.copy_from_slice(src);
+        }
+        res
+    }
+
     /// Returns an iterator over the coordinates stored in this [`Frame`].
-    pub fn coords(&self) -> impl Iterator<Item = Vec3> + '_ {
-        self.positions.chunks_exact(3).map(Vec3::from_slice)
+    pub fn coords(&self) -> impl Iterator<Item = Position> + '_ {
+        // We can safely unwrap here, because we know the chunks are exactly three wide.
+        self.positions
+            .chunks_exact(3)
+            .map(|p| p.try_into().unwrap())
     }
 
     /// Returns the number of atoms in this [`Frame`].

@@ -38,9 +38,9 @@ fn count_atoms(
     reader.read_frame_with_selection(&mut frame, &atom_selection)?;
     reader.home()?;
 
-    // Check that there's no NaNs in the output frame.
-    assert_eq!(frame.coords().position(|v| v.is_nan()), None);
-    assert_eq!(frame.coords().filter(|v| v.is_nan()).count(), 0);
+    let is_nan = |p: molly::Position| p.into_iter().any(f32::is_nan);
+    assert_eq!(frame.coords().position(is_nan), None);
+    assert_eq!(frame.coords().filter(|&p| is_nan(p)).count(), 0);
 
     Ok(frame.coords().count())
 }

@@ -23,7 +23,7 @@ fn main() -> std::io::Result<()> {
         trajectory.read(&mut cfframe).unwrap();
 
         for (a, &b) in frame.coords().zip(cfframe.positions()) {
-            let a = a.to_array().map(|v| round_to(v, decimals));
+            let a = a.map(|v| round_to(v, decimals));
             let b = b.map(|v| v as f32 * 0.1).map(|v| round_to(v, decimals));
             // eprintln!("a, b = {a:?}\t\t{b:?}");
             assert_eq!(a, b);

@@ -249,12 +249,13 @@ pub fn read_compressed_positions<'s, 'r, B: Buffered<'s, 'r, R>, R: Read>(
 pub(crate) fn read_boxvec<R: Read>(file: &mut R) -> io::Result<BoxVec> {
     let mut boxvec = [0.0; 9];
     read_f32s(file, &mut boxvec)?;
-    let cols = [
-        [boxvec[0], boxvec[1], boxvec[2]],
-        [boxvec[3], boxvec[4], boxvec[5]],
-        [boxvec[6], boxvec[7], boxvec[8]],
+    #[rustfmt::skip]
+    let boxvec = [
+        boxvec[0], boxvec[1], boxvec[2],
+        boxvec[3], boxvec[4], boxvec[5],
+        boxvec[6], boxvec[7], boxvec[8],
     ];
-    Ok(BoxVec::from_cols_array_2d(&cols))
+    Ok(boxvec)
 }
 
 pub(crate) fn read_f32s<R: Read>(file: &mut R, buf: &mut [f32]) -> io::Result<()> {
