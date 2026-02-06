@@ -40,7 +40,7 @@ filtering xtc files. It supports the 1995 and 2023 magic numbers.
 ### Command line application
 
 ```console
-cargo install molly
+cargo install molly -F cli
 ```
 
 #### Usage

@@ -302,6 +302,12 @@ struct WriteArgs {
     force_magic: Option<i32>,
 }
 
+#[cfg(not(feature = "cli"))]
+fn main() {
+    panic!("The 'cli' feature must be enabled to use this binary.");
+}
+
+#[cfg(feature = "cli")]
 fn main() -> std::io::Result<()> {
     let args = Args::parse();
 

@@ -18,9 +18,14 @@ path = "src/lib.rs"
 [[bin]]
 name = "molly"
 path = "src/main.rs"
+required-features = ["cli"]
 
 [dependencies]
-clap = { version = "4.5.4", features = ["derive"] }
+clap = { version = "4.5.4", features = ["derive"], optional = true }
+
+[features]
+default = []
+cli = ["dep:clap"]
 
 [dev-dependencies]
 chemfiles = "0.10.41"
